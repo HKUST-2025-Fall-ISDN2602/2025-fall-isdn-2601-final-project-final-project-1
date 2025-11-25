@@ -1,11 +1,6 @@
-/*
- * ISDN 2601 Final Project: 5-Servo Mechanical Arm Control
- * Corrected version with inverted angles for opposite arm movement
- */
-
 #include <Servo.h>
 
-// Define servo objects
+// Define servo 
 Servo baseServo;
 Servo shoulderServo;  
 Servo elbowServo;
@@ -15,38 +10,36 @@ Servo gripperServo;
 // ESP8266 pins
 const int BASE_PIN = D1;
 const int SHOULDER_PIN = D2;
-const int ELBOW_PIN = D3;
-const int WRIST_PIN = D4;
+const int ELBOW_PIN = D6;
+const int WRIST_PIN = D0;
 const int GRIPPER_PIN = D5;
 
-// Servo limits
+// Servo limits for values
 const int BASE_MIN = 0;
 const int BASE_MAX = 180;
-const int SHOULDER_MIN = 30;
-const int SHOULDER_MAX = 150;
-const int ELBOW_MIN = 20;
-const int ELBOW_MAX = 160;
-const int WRIST_MIN = 40;
-const int WRIST_MAX = 140;
-const int GRIPPER_OPEN = 70;
+const int SHOULDER_MIN = 0;
+const int SHOULDER_MAX = 180;
+const int ELBOW_MIN = 0;
+const int ELBOW_MAX = 180;
+const int WRIST_MIN = 0;
+const int WRIST_MAX = 180;
+const int GRIPPER_OPEN = 50;
 const int GRIPPER_CLOSE = 120;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(921600);
   delay(1000);
   
   Serial.println();
-  Serial.println("=== MECHANICAL ARM CONTROL ===");
-  Serial.println("Initializing servos...");
+  Serial.println(" MECHANICAL ARM CONTROL ");
+  Serial.println("Initializing servos");
   
-  // Attach servos
   baseServo.attach(BASE_PIN);
   shoulderServo.attach(SHOULDER_PIN);
   elbowServo.attach(ELBOW_PIN);
   wristServo.attach(WRIST_PIN);
   gripperServo.attach(GRIPPER_PIN);
   
-  // Move to home position
   resetArm();
   delay(2000);
   
@@ -152,149 +145,78 @@ void setServoAngle(Servo &servo, int angle, int minAngle, int maxAngle, String n
   delay(500);
 }
 
-// ================= CORRECTED AUTONOMOUS SEQUENCES =================
+// sequences
 
 void pickAndPlaceCube() {
-  // Approach cube position 
-  moveToPosition(180, 80, 150, 150, GRIPPER_OPEN);  // Shoulder up, elbow down
+  moveToPosition(0, 80, 0, 180, 50); 
   delay(1500);
   
-  // Lower to pick position
-  moveToPosition(180, 80, 150, 150, GRIPPER_OPEN);   // Shoulder down, elbow up
-  delay(1000);
-  
-  // Grab cube
   closeGripper();
   delay(1000);
   
-  // Lift cube
-  moveToPosition(200, 150, 60, 60, GRIPPER_CLOSE); // Shoulder up, elbow down
+  moveToPosition(140, 140, 0, 130, 90); 
   delay(1000);
   
-  // Move to frame position
-  moveToPosition(200, 150, 65, 100, GRIPPER_CLOSE); // Base left, shoulder up
-  delay(1500);
-  
-  // Lower to place position
-  moveToPosition(200, 110, 55, 95, GRIPPER_CLOSE);  // Shoulder down, elbow up
-  delay(1000);
-  
-  // Release cube
   openGripper();
   delay(1000);
   
-  // Retract from frame
-  moveToPosition(200, 150, 70, 105, GRIPPER_OPEN);  // Shoulder up, elbow down
-  delay(1000);
-  
-  // Return home
   resetArm();
 }
 
 void pickAndPlaceCylinder() {
-  // Approach cylinder position (INVERTED ANGLES)
-  moveToPosition(120, 115, 55, 90, GRIPPER_OPEN);  // Base right, shoulder up
+  moveToPosition(0, 80, 0, 180, 50); 
   delay(1500);
   
-  // Lower to pick position
-  moveToPosition(120, 105, 45, 85, GRIPPER_OPEN);  // Shoulder down, elbow up
-  delay(1000);
-  
-  // Grab cylinder
   closeGripper();
   delay(1000);
   
-  // Lift cylinder
-  moveToPosition(120, 125, 65, 95, GRIPPER_CLOSE); // Shoulder up, elbow down
+  moveToPosition(180, 140, 0, 130, 90); 
   delay(1000);
   
-  // Move to frame position
-  moveToPosition(30, 115, 60, 90, GRIPPER_CLOSE);  // Base left, shoulder up
-  delay(1500);
   
-  // Lower to place position
-  moveToPosition(30, 105, 50, 85, GRIPPER_CLOSE);  // Shoulder down, elbow up
-  delay(1000);
-  
-  // Release cylinder
   openGripper();
   delay(1000);
+
+  moveToPosition(180, 120, 100, 180, 50);  
+  delay(1500);
   
-  // Retract from frame
-  moveToPosition(30, 125, 65, 95, GRIPPER_OPEN);   // Shoulder up, elbow down
-  delay(1000);
-  
-  // Return home
   resetArm();
 }
 
 void pickAndPlaceHat() {
-  // Approach hat position (INVERTED ANGLES)
-  moveToPosition(135, 110, 50, 80, GRIPPER_OPEN);  // Base right, shoulder up
+  moveToPosition(0, 180, 40, 90, 70); 
   delay(1500);
   
-  // Lower to pick position
-  moveToPosition(135, 100, 40, 75, GRIPPER_OPEN);  // Shoulder down, elbow up
-  delay(1000);
-  
-  // Grab hat
   closeGripper();
   delay(1000);
   
-  // Lift hat
-  moveToPosition(135, 120, 60, 85, GRIPPER_CLOSE); // Shoulder up, elbow down
+  moveToPosition(130, 180, 0, 150, GRIPPER_CLOSE); 
   delay(1000);
   
-  // Move to frame position
-  moveToPosition(45, 110, 50, 80, GRIPPER_CLOSE);  // Base left, shoulder up
-  delay(1500);
-  
-  // Lower to place position
-  moveToPosition(45, 100, 40, 75, GRIPPER_CLOSE);  // Shoulder down, elbow up
-  delay(1000);
-  
-  // Release hat
+
   openGripper();
-  delay(1000);
-  
-  // Retract from frame
-  moveToPosition(45, 120, 60, 85, GRIPPER_OPEN);   // Shoulder up, elbow down
   delay(1000);
   
   resetArm();
 }
 
 void pickAndPlaceBoat() {
-  // Approach boat position (INVERTED ANGLES)
-  moveToPosition(150, 105, 45, 70, GRIPPER_OPEN);  // Base right, shoulder up
+
+  moveToPosition(0, 180, 35, 90, GRIPPER_OPEN);  
   delay(1500);
   
-  // Lower to pick position
-  moveToPosition(150, 95, 35, 65, GRIPPER_OPEN);   // Shoulder down, elbow up
-  delay(1000);
-  
-  // Grab boat
+
   closeGripper();
   delay(1000);
   
-  // Lift boat
-  moveToPosition(150, 115, 55, 75, GRIPPER_CLOSE); // Shoulder up, elbow down
+  moveToPosition(0, 70, 35, 90, GRIPPER_CLOSE); 
   delay(1000);
-  
-  // Move to frame position
-  moveToPosition(30, 105, 45, 70, GRIPPER_CLOSE);  // Base left, shoulder up
-  delay(1500);
-  
-  // Lower to place position
-  moveToPosition(30, 95, 35, 65, GRIPPER_CLOSE);   // Shoulder down, elbow up
+
+  moveToPosition(180, 180, 0, 150, GRIPPER_CLOSE); 
   delay(1000);
+
   
-  // Release boat
   openGripper();
-  delay(1000);
-  
-  // Retract from frame
-  moveToPosition(30, 115, 55, 75, GRIPPER_OPEN);   // Shoulder up, elbow down
   delay(1000);
   
   resetArm();
@@ -310,7 +232,7 @@ void executeFullSequence() {
   pickAndPlaceBoat();
 }
 
-// ================= UTILITY FUNCTIONS =================
+// automated functions
 
 void moveToPosition(int base, int shoulder, int elbow, int wrist, int gripper) {
   base = constrain(base, BASE_MIN, BASE_MAX);
@@ -350,10 +272,10 @@ void resetArm() {
 }
 
 void testSequence() {
-  Serial.println("=== TESTING SERVO MOVEMENT ===");
+  Serial.println(" TESTING SERVO MOVEMENT ");
   
-  // Test base movement
-  Serial.println("Testing base servo...");
+ 
+  Serial.println("Testing base servo");
   baseServo.write(60);
   delay(1000);
   baseServo.write(120);
@@ -361,26 +283,26 @@ void testSequence() {
   baseServo.write(90);
   delay(1000);
   
-  // Test shoulder movement (inverted)
-  Serial.println("Testing shoulder servo...");
-  shoulderServo.write(120);  // Up position
+  
+  Serial.println("Testing shoulder servo");
+  shoulderServo.write(120);  
   delay(1000);
-  shoulderServo.write(60);   // Down position  
+  shoulderServo.write(60);  
   delay(1000);
-  shoulderServo.write(90);   // Middle
+  shoulderServo.write(90);   
   delay(1000);
   
-  // Test elbow movement (inverted)
-  Serial.println("Testing elbow servo...");
-  elbowServo.write(60);      // Down position
+  
+  Serial.println("Testing elbow servo");
+  elbowServo.write(60);     
   delay(1000);
-  elbowServo.write(120);     // Up position
+  elbowServo.write(120);    
   delay(1000);
-  elbowServo.write(90);      // Middle
+  elbowServo.write(90);    
   delay(1000);
   
-  // Test gripper
-  Serial.println("Testing gripper...");
+ 
+  Serial.println("Testing gripper");
   openGripper();
   delay(1000);
   closeGripper();
@@ -389,5 +311,5 @@ void testSequence() {
   delay(1000);
   
   resetArm();
-  Serial.println("=== TEST COMPLETE ===");
+  Serial.println(" TEST COMPLETE ");
 }
